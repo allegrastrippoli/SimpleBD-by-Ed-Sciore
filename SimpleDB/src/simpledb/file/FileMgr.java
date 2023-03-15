@@ -60,7 +60,7 @@ public class FileMgr {
          RandomAccessFile f = getFile(blk.fileName()); // getFile dal nome del file te lo restituisce 
          f.seek(blk.number() * blocksize); // vai al blocco n * blocksize, seek del 
          f.getChannel().read(p.contents()); // apri un canale e leggi il contenuto della page
-         blockStats.logReadBlock(blk);
+         this.blockStats.logReadBlock(blk);
       }
       catch (IOException e) {
          throw new RuntimeException("cannot read block " + blk);
@@ -72,7 +72,7 @@ public class FileMgr {
          RandomAccessFile f = getFile(blk.fileName());
          f.seek(blk.number() * blocksize);
          f.getChannel().write(p.contents());
-         blockStats.WrittenBlock(blk);
+         this.blockStats.WrittenBlock(blk);
       }
       catch (IOException e) {
          throw new RuntimeException("cannot write block" + blk);

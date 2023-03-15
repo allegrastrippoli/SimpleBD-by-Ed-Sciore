@@ -1,9 +1,13 @@
 package simpledb.buffer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import simpledb.file.*;
 import simpledb.log.LogMgr;
@@ -17,10 +21,8 @@ public class BufferMgr {
 	private Buffer[] bufferpool;
 	private int numAvailable;
 	private static final long MAX_TIME = 10000; // 10 seconds
-	private static final String strategy = "FIFO";
+	private static final String strategy = "LRU"; // posso implementarlo anche con classe enum
 	private static int opNumber = -1;
-	
-	// private Map<Buffer, Integer> timePinList; // FIFO
 
 
 	public static int getOpNumber() {
@@ -43,8 +45,8 @@ public class BufferMgr {
 		numAvailable = numbuffs;
 		for (int i=0; i<numbuffs; i++)
 			bufferpool[i] = new Buffer(fm, lm);
-		
-		// this.timePinList = new HashMap<>(); // FIFO
+
+
 	}
 
 	/**
@@ -72,9 +74,9 @@ public class BufferMgr {
 	 * @param buff the buffer to be unpinned
 	 */
 	public synchronized void unpin(Buffer buff) {
-		
+
 		buff.unpin(opNumber++);
-		
+
 		if (!buff.isPinned()) {
 			numAvailable++;
 			notifyAll();
@@ -130,6 +132,7 @@ public class BufferMgr {
 		if (!buff.isPinned())
 			numAvailable--;
 		buff.pin(opNumber++);
+
 		return buff;
 	}
 
@@ -142,21 +145,64 @@ public class BufferMgr {
 		return null;
 	}
 
+	
+	// Diverse strategie per sostituire le pagine
+
+	private Buffer chooseUnpinnedBufferNaive() {
+		for (Buffer buff : bufferpool)
+			if (!buff.isPinned())
+				return buff;
+		return null;
+	}
+
+	private Buffer chooseUnpinnedBufferFIFO() {
+		List<Buffer> buffers = new ArrayList<>(Arrays.asList(bufferpool));
+
+		Collections.sort(buffers, new PinComparator());
+
+		for (Buffer buff : buffers)
+			if (!buff.isPinned())
+				return buff;
+		return null;
+	}
+	
+
+	private Buffer chooseUnpinnedBufferLRU() {
+		List<Buffer> buffers = new ArrayList<>(Arrays.asList(bufferpool));
+
+		Collections.sort(buffers, new UnpinComparator());
+
+		for (Buffer buff : buffers)
+			if (!buff.isPinned())
+				return buff;
+		return null;
+	}
+	
+
 
 	private Buffer chooseUnpinnedBuffer() {
 
-		if(strategy.equals("NAIVE")) {
-			for (Buffer buff : bufferpool)
-				if (!buff.isPinned())
-					return buff;
-		} 
+		if(strategy.equals("NAIVE")) 
+			return chooseUnpinnedBufferNaive();
+
+		/* FIFO deve scorrere i vari oggetti Buffer,
+		 * guardare il campo timePin
+		 * l'oggetto che ha min(timePin) && !isPinned verra' selezionato 
+		 * se nessun oggetto rispetta la condizione, il metodo ritorna null
+		 * 
+		 * quindi si puo' costruire una lista ordinata 
+		 * l'ordinamento e' basato proprio sul timePin crescente */
+
+		if(strategy.equals("FIFO")) 
+			return chooseUnpinnedBufferFIFO();
 		
-		if(strategy.equals("FIFO")) {
-			
+		if(strategy.equals("LRU")) 
+			return chooseUnpinnedBufferLRU();
 		
-		
-		}
+//		if(strategy.equals("CLOCK")) 
+//			return chooseUnpinnedBufferCLOCK();
 		
 		return null;
+
 	}
 }

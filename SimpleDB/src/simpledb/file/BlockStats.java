@@ -44,6 +44,7 @@ public class BlockStats {
 		
 	}
 
+	
 	public void reset() {
 		
 		writtenBlocksPerFile.clear();
@@ -55,7 +56,7 @@ public class BlockStats {
 	@Override
 	public String toString() {
 		
-		return "scrittura: " + writtenBlocksPerFile.toString() + "lettura: " + readBlocksPerFile.toString();
+		return "scrittura: " + writtenBlocksPerFile.toString() + "\n" + "lettura: " + readBlocksPerFile.toString();
 		
 	}
 }

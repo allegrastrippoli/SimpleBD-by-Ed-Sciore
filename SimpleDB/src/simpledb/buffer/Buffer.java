@@ -1,5 +1,6 @@
 package simpledb.buffer;
 
+
 import simpledb.file.*;
 import simpledb.log.LogMgr;
 
@@ -21,7 +22,7 @@ public class Buffer {
 	private int txnum = -1;
 	private int lsn = -1;
 	private int timePin = -1;
-	private int timeUnpin =1;
+	private int timeUnpin = -1;
 
 	public Buffer(FileMgr fm, LogMgr lm) {
 		this.fm = fm;
