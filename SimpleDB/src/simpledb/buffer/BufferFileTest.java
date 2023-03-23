@@ -6,6 +6,8 @@ import simpledb.file.Page;
 import simpledb.server.SimpleDB;
 
 public class BufferFileTest {
+	
+	
    public static void main(String[] args) throws IOException {
       SimpleDB db = new SimpleDB("bufferfiletest", 400, 8);
       BufferMgr bm = db.bufferMgr();
@@ -26,5 +28,7 @@ public class BufferFileTest {
       System.out.println("offset " + pos2 + " contains " + p2.getInt(pos2));
       System.out.println("offset " + pos1 + " contains " + p2.getString(pos1));
       bm.unpin(b2);
+      
+      
    }
 }

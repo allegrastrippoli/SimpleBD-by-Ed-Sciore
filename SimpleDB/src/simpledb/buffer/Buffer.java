@@ -1,6 +1,8 @@
 package simpledb.buffer;
 
 
+import java.util.Objects;
+
 import simpledb.file.*;
 import simpledb.log.LogMgr;
 
@@ -17,12 +19,12 @@ public class Buffer {
 	private FileMgr fm;
 	private LogMgr lm;
 	private Page contents;
-	private BlockId blk = null;
-	private int pins = 0;
-	private int txnum = -1;
-	private int lsn = -1;
-	private int timePin = -1;
-	private int timeUnpin = -1;
+	private BlockId blk = null; //  un riferimento al blocco che per ultimo e' stato caricato nella pagina
+	private int pins = 0; // intero che indica il numero di pin su una pagina
+	private int txnum = -1; // id of the transaction
+	private int lsn = -1; // the LSN of the log record. A negative LSN value indicates that a log record was not necessary.
+	private int timePin = -1; // istante in cui e' stato effettuato l’ultimo caricamento
+	private int timeUnpin = -1; // istante in cui la pagina `e stata per l’ultima volta liberata
 
 	public Buffer(FileMgr fm, LogMgr lm) {
 		this.fm = fm;
@@ -33,6 +35,15 @@ public class Buffer {
 	public Page contents() {
 		return contents;
 	}
+	
+	public int getPins() {
+		return pins;
+	}
+
+	public void setPins(int pins) {
+		this.pins = pins;
+	}
+
 
 	/**
 	 * Returns a reference to the disk block
@@ -92,6 +103,8 @@ public class Buffer {
 		pins = 0;
 	}
 
+
+
 	/**
 	 * Write the buffer to its disk block if it is dirty.
 	 */
@@ -118,4 +131,18 @@ public class Buffer {
 		pins--;
 		this.timeUnpin = opNumber;
 	}
+	
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Buffer other = (Buffer) obj;
+		return Objects.equals(blk, other.blk);
+	}
+	
 }
