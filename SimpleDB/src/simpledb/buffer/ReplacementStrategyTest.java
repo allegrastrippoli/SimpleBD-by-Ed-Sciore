@@ -100,7 +100,7 @@ public class ReplacementStrategyTest {
 
 		// OP 17
 
-		buff[0] =	bm.pin(new BlockId("A", 70));
+		buff[0] = bm.pin(new BlockId("A", 70));
 
 		print(bm);
 
