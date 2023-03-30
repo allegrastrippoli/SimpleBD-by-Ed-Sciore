@@ -6,6 +6,7 @@ import simpledb.tx.Transaction;
 
 public class RecordTest {
    public static void main(String[] args) throws Exception {
+	  /* blocksize, buffsize */
       SimpleDB db = new SimpleDB("recordtest", 400, 8);
       Transaction tx = db.newTx();
 
@@ -13,6 +14,7 @@ public class RecordTest {
       sch.addIntField("A");
       sch.addStringField("B", 9);
       Layout layout = new Layout(sch);
+      
       for (String fldname : layout.schema().fields()) {
          int offset = layout.offset(fldname);
          System.out.println(fldname + " has offset " + offset);
